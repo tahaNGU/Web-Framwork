@@ -1,37 +1,29 @@
 package validation
 
 import (
+	"errors"
 	"github.com/go-playground/validator/v10"
-	"log"
-	"regexp"
 )
 
-//import (
-//	"github.com/go-playground/validator/v10"
-//	"log"
-//	"regexp"
-//)
-//
-//func IranianMobileNumberValidation(fid validator.FieldLevel) bool {
-//	value, ok := fid.Field().Interface().(string)
-//	if !ok {
-//		return false
-//	}
-//	res, err := regexp.MatchString("^[0-9]{10}$", value)
-//	if err != nil {
-//		log.Print(err.Error())
-//	}
-//	return res
-//}
+type ValidationError struct {
+	Property string `json:"property"`
+	Tag      string `json:"tag"`
+	value    string `json:"value"`
+	Message  string `json:"message"`
+}
 
-func IranianMobileNumberValidation(fid validator.FieldLevel) bool {
-	value, ok := fid.Field().Interface().(string)
-	if !ok {
-		return false
+func GetValidationError(err error) *[]ValidationError {
+	var validationErrors []ValidationError
+	var ve validator.ValidationErrors
+	if errors.As(err, &ve) {
+		for _, v := range err.(validator.ValidationErrors) {
+			var el ValidationError
+			el.Property = v.Field()
+			el.Tag = v.Tag()
+			el.value = v.Param()
+			validationErrors = append(validationErrors, el)
+		}
+		return &validationErrors
 	}
-	res, err := regexp.MatchString(`^\d{8,}$`, value)
-	if err != nil {
-		log.Print(err.Error())
-	}
-	return res
+	return nil
 }

@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"tahaNGU/api/helper"
 )
 
 type HealthStruct struct {
@@ -19,9 +20,8 @@ func NewHealthStruct() *HealthStruct {
 }
 
 func (h *HealthStruct) Ping(c *gin.Context) {
-	c.JSON(200, gin.H{
-		"message": "pong",
-	})
+	c.JSON(http.StatusOK, helper.GenerateBaseResponse("working", true, 0))
+	return
 }
 
 func (h *HealthStruct) GetHead(c *gin.Context) {
